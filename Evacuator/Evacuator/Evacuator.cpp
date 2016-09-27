@@ -189,10 +189,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		for (string buf; getline(ifs, buf);) {
 			boost::trim(buf);
 			if (buf.length() != 0 && buf[0] != ';') {
+				auto n = ExpandEnvironmentStringsA(buf.c_str(), nullptr, 0);
+				vector<char> buf2(n);
+				ExpandEnvironmentStringsA(buf.c_str(), &buf2[0], n);
 				if (s) {
-					src = move(buf);
+					src = &buf2[0];
 				} else {
-					files.push_back(make_tuple(move(src), move(buf)));
+					files.push_back(make_tuple(move(src), &buf2[0]));
 				}
 				s = !s;
 			}
